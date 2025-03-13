@@ -1,0 +1,67 @@
+/* Header & Register CSS */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+h2{
+    font-size: 60px !important;
+    font-weight: 600;
+}
+
+form {
+    background: white;
+    padding: 30px !important;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+input, select {
+    width: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+
+button {
+    background: #1ecafa;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+button:hover {
+    background: #0056b3;
+    color: #949494;
+}
+
+
+a {
+    margin-top: 10px;
+    text-decoration: none;
+    color: #000;
+    font-size: 18px;
+    margin-top: 20px !important;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #7e7e7e;
+}
+
