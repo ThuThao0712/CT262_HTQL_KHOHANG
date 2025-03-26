@@ -13,7 +13,7 @@
         }
 
         if (empty($errorMessage)) {
-            $mysqli = new mysqli("localhost", "root", "", "qlkhohang"); //chỉnh kết nối 
+            $mysqli = new mysqli("localhost", "TK_TenDangNhap", "TK_MatKhau", "qlkhohang"); //chỉnh kết nối 
             if ($mysqli->connect_error) {
                 die("Kết nối không thành công: " . $mysqli->connect_error);
             }

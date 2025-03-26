@@ -4,8 +4,8 @@ if (isset($_GET["NCC_ID"])) {
 
     // Kết nối CSDL
     $servername = "localhost"; 
-    $username = "root"; // Hoặc TK_TenDangNhap nếu có tài khoản riêng
-    $password = ""; // Nếu có mật khẩu thì thay vào
+    $username = "TK_TenDangNhap"; // Hoặc TK_TenDangNhap nếu có tài khoản riêng
+    $password = "TK_MatKhau"; // Nếu có mật khẩu thì thay vào
     $dbname = "qlkhohang"; 
 
     $connection = new mysqli($servername, $username, $password, $dbname);

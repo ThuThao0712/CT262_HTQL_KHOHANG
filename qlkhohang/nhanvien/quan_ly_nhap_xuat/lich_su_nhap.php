@@ -1,22 +1,31 @@
 <?php
-    require_once '../blocks/head.php';
+session_start();
+require_once '../blocks/head.php';
 
-    $servername = "localhost"; 
-    $username = "root"; 
-    $password = ""; 
-    $dbname = "qlkhohang"; 
+// Kiểm tra nếu nhân viên chưa đăng nhập
+if (!isset($_SESSION['NV_ID']) || !isset($_SESSION['KHO_ID'])) {
+    die("Bạn chưa đăng nhập hoặc không có quyền truy cập!");
+}
 
-    // Kết nối database
-    $connection = new mysqli($servername, $username, $password, $dbname);
-    if ($connection->connect_error) {
-        die("Kết nối không thành công: " . $connection->connect_error);
-    }
+// Lấy KHO_ID của nhân viên từ session
+$KHO_ID = $_SESSION['KHO_ID'];
 
-    // Xử lý tìm kiếm
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : '';
-    
-    $sql = "SELECT 
+$servername = "localhost"; 
+$username = "TK_TenDangNhap"; 
+$password = "TK_MatKhau"; 
+$dbname = "qlkhohang"; 
+
+// Kết nối database
+$connection = new mysqli($servername, $username, $password, $dbname);
+if ($connection->connect_error) {
+    die("Kết nối không thành công: " . $connection->connect_error);
+}
+
+// Xử lý tìm kiếm
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : '';
+
+$sql = "SELECT 
     phieu_nhap.PN_ID, 
     phieu_nhap.PN_NgayLap, 
     nhan_vien.NV_HoTen, 
@@ -24,30 +33,52 @@
     phieu_nhap.PN_TongSoLuongNhap, 
     phieu_nhap.PN_TongTienNhap, 
     kho_hang.KHO_Ten,
-    GROUP_CONCAT(san_pham.SP_Ten SEPARATOR ', ') AS DanhSachSanPham
-    FROM phieu_nhap 
-    LEFT JOIN nhan_vien ON phieu_nhap.NV_ID = nhan_vien.NV_ID 
-    LEFT JOIN nha_cung_cap ON phieu_nhap.NCC_ID = nha_cung_cap.NCC_ID
-    LEFT JOIN chi_tiet_phieu_nhap ctpn ON phieu_nhap.PN_ID = ctpn.PN_ID
-    LEFT JOIN san_pham ON ctpn.SP_ID = san_pham.SP_ID
-    LEFT JOIN kho_cn ON ctpn.SP_ID = kho_cn.SP_ID
-    LEFT JOIN kho_hang ON kho_cn.KHO_ID = kho_hang.KHO_ID
-    WHERE (phieu_nhap.PN_NgayLap LIKE '%$search%' 
-        OR nha_cung_cap.NCC_HoTen LIKE '%$search%' 
-        OR EXISTS (SELECT 1 FROM chi_tiet_phieu_nhap ctpn2 
-                JOIN san_pham sp ON ctpn2.SP_ID = sp.SP_ID 
-                WHERE ctpn2.PN_ID = phieu_nhap.PN_ID AND sp.SP_Ten LIKE '%$search%'))
-    ";
+    GROUP_CONCAT(DISTINCT san_pham.SP_Ten SEPARATOR ', ') AS DanhSachSanPham
+FROM phieu_nhap 
+LEFT JOIN nhan_vien ON phieu_nhap.NV_ID = nhan_vien.NV_ID 
+LEFT JOIN nha_cung_cap ON phieu_nhap.NCC_ID = nha_cung_cap.NCC_ID
+LEFT JOIN chi_tiet_phieu_nhap ctpn ON phieu_nhap.PN_ID = ctpn.PN_ID
+LEFT JOIN san_pham ON ctpn.SP_ID = san_pham.SP_ID
+LEFT JOIN kho_cn ON ctpn.SP_ID = kho_cn.SP_ID
+LEFT JOIN kho_hang ON kho_cn.KHO_ID = kho_hang.KHO_ID
+WHERE kho_cn.KHO_ID = ?";  // Chỉ lấy dữ liệu từ kho của nhân viên
 
-    if (!empty($date_filter)) {
-    $sql .= " AND phieu_nhap.PN_NgayLap = '$date_filter'";
-    }
+// Thêm điều kiện tìm kiếm nếu có
+if (!empty($search)) {
+    $sql .= " AND (phieu_nhap.PN_NgayLap LIKE ? 
+                OR nha_cung_cap.NCC_HoTen LIKE ? 
+                OR EXISTS (SELECT 1 FROM chi_tiet_phieu_nhap ctpn2 
+                    JOIN san_pham sp ON ctpn2.SP_ID = sp.SP_ID 
+                    WHERE ctpn2.PN_ID = phieu_nhap.PN_ID AND sp.SP_Ten LIKE ?))";
+}
 
-    $sql .= " GROUP BY phieu_nhap.PN_ID ORDER BY phieu_nhap.PN_NgayLap DESC";
+// Lọc theo ngày nếu có
+if (!empty($date_filter)) {
+    $sql .= " AND phieu_nhap.PN_NgayLap = ?";
+}
 
-    
-    $result = $connection->query($sql);
+$sql .= " GROUP BY phieu_nhap.PN_ID ORDER BY phieu_nhap.PN_NgayLap DESC";
+
+// Chuẩn bị truy vấn
+$stmt = $connection->prepare($sql);
+
+// Gán giá trị cho truy vấn
+if (!empty($search) && !empty($date_filter)) {
+    $search_param = "%$search%";
+    $stmt->bind_param("isss", $KHO_ID, $search_param, $search_param, $search_param, $date_filter);
+} elseif (!empty($search)) {
+    $search_param = "%$search%";
+    $stmt->bind_param("isss", $KHO_ID, $search_param, $search_param, $search_param);
+} elseif (!empty($date_filter)) {
+    $stmt->bind_param("is", $KHO_ID, $date_filter);
+} else {
+    $stmt->bind_param("i", $KHO_ID);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -83,7 +114,6 @@
                                 <td>Nhân Viên</td>
                                 <td>Nhà Cung Cấp</td>
                                 <td>Tổng Số Lượng</td>
-                                <td>Tổng Tiền</td>
                                 <td>Kho Nhập</td>
                                 <td>Sản Phẩm</td>
                                 <td>Chi Tiết</td>
@@ -100,7 +130,6 @@
                                         <td>{$row['NV_HoTen']}</td>
                                         <td>{$row['NCC_HoTen']}</td>
                                         <td>{$row['PN_TongSoLuongNhap']}</td>
-                                        <td>{$row['PN_TongTienNhap']}</td>
                                         <td>{$row['KHO_Ten']}</td>
                                         <td>{$row['DanhSachSanPham']}</td>
                                         <td><a href='chitiet_nhap.php?PN_ID={$row['PN_ID']}' class='btn btn-outline-primary'>Xem</a></td>

@@ -2,8 +2,8 @@
     require_once '../blocks/head.php';
 
     $servername = "localhost"; 
-    $username = "root"; 
-    $password = ""; 
+    $username = "TK_TenDangNhap"; 
+    $password = "TK_MatKhau"; 
     $dbname = "qlkhohang"; 
 
     $connection = new mysqli($servername, $username, $password, $dbname);
@@ -54,8 +54,6 @@
                             <tr>
                                 <th>Tên Sản Phẩm</th>
                                 <th>Số Lượng Nhập</th>
-                                <th>Đơn Giá Nhập</th>
-                                <th>Phần Trăm Thuế</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,8 +64,6 @@
                                     <tr>
                                         <td>{$row['SP_Ten']}</td>
                                         <td>{$row['CTPN_SoLuongNhap']}</td>
-                                        <td>" . number_format($row['CTPN_GiaNhap']) . "</td>
-                                        <td>{$row['CTPN_ThueVAT']}%</td>
                                     </tr>";
                                 }
                             } else {

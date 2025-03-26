@@ -1,15 +1,21 @@
 <?php
-session_start();
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "qlkhohang";
+    session_start();
+  // Database connection
+  $servername = "localhost";
+  $username = "TK_TenDangNhap";
+  $password = "TK_MatKhau";
+  $dbname = "qlkhohang";
 
-// Kết nối MySQL
-$conn = new mysqli($servername, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
+  // Create connection
+  $conn = new mysqli($servername, $username, $password, $dbname);
+
+  // Check connection
+  if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+  }
+  else{
+      // echo "Thanh cong";
+    }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
@@ -23,15 +29,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        
-        // Debug: In ra mật khẩu để kiểm tra
-        var_dump($row['TK_MatKhau']);
-        var_dump($password);
 
         // Kiểm tra mật khẩu (không mã hóa)
         if ($password == $row['TK_MatKhau']) {
             $_SESSION['TK_ID'] = $row['TK_ID'];
             $_SESSION['TK_VaiTro'] = $row['TK_VaiTro'];
+            
+            if ($row['TK_VaiTro'] == 'Nhân Viên') {
+                $stmt_nv = $conn->prepare("SELECT NV_ID, KHO_ID FROM nhan_vien WHERE TK_ID = ?");
+                $stmt_nv->bind_param("i", $row['TK_ID']);
+                $stmt_nv->execute();
+                $result_nv = $stmt_nv->get_result();
+
+                if ($result_nv->num_rows > 0) {
+                    $nv = $result_nv->fetch_assoc();
+                    $_SESSION['NV_ID'] = $nv['NV_ID']; // Lưu NV_ID
+                    $_SESSION['KHO_ID'] = $nv['KHO_ID']; // Lưu KHO_ID của nhân viên
+                }
+                $stmt_nv->close();
+            }
+
 
             // Chuyển hướng theo vai trò
             if ($row['TK_VaiTro'] == 'Quản Lý') {
@@ -42,8 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "Vai trò không hợp lệ!";
             }
             exit();
-        } else {
-            echo "Sai mật khẩu!";
+        }
+        else{
+            echo "Tài khoản hoặc mật khẩu không chính xác";
         }
     } else {
         echo "Tài khoản không tồn tại!";
@@ -68,7 +86,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" name="password" placeholder="Mật khẩu" required>
         <button type="submit">Đăng nhập</button>
     </form>
-    <a href="index.php">Chưa có tài khoản? Đăng ký</a>
 </body>
 </html>
 

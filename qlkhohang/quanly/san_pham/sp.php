@@ -2,8 +2,8 @@
 require_once '../blocks/head.php';
 
 $servername = "localhost"; 
-$username = "root"; 
-$password = ""; 
+$username = "TK_TenDangNhap"; 
+$password = "TK_MatKhau"; 
 $dbname = "qlkhohang"; 
 
 $connection = new mysqli($servername, $username, $password, $dbname);
@@ -57,7 +57,6 @@ $result = $connection->query($sql);
                             <tr>
                                 <td>ID</td>
                                 <td>Tên Sản Phẩm</td>
-                                <td>Giá</td>
                                 <td>Danh Mục</td>
                                 <td>Nhà Cung Cấp</td>
                                 <td>Số Lượng Tồn Kho</td>
@@ -74,7 +73,6 @@ $result = $connection->query($sql);
                                 <tr>
                                     <td>{$row['SP_ID']}</td>
                                     <td>{$row['SP_Ten']}</td>
-                                    <td>" . number_format($row['SP_Gia'], 0, ',', '.') . " đ</td>
                                     <td>{$row['DM_Ten']}</td>
                                     <td>{$row['NCC_HoTen']}</td>
                                     <td>{$row['KCN_SoLuong']}</td>

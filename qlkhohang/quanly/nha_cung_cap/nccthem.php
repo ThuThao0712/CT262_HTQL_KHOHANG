@@ -11,7 +11,7 @@
         $NCC_DiaChi = test_input($_POST["NCC_DiaChi"]);
         $NCC_Email = test_input($_POST["NCC_Email"]);
 
-        $mysqli = new mysqli("localhost", "root", "", "qlkhohang"); // chỉnh cái này
+        $mysqli = new mysqli("localhost", "TK_TenDangNhap", "TK_MatKhau", "qlkhohang"); // chỉnh cái này
         
         if ($mysqli->connect_error) {
             die("Kết nối không thành công: " . $mysqli->connect_error);

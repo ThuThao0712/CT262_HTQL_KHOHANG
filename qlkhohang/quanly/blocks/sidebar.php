@@ -13,7 +13,8 @@
         <li class="sidebar-item"><a href="/qlkhohang/quanly/quan_ly_nhap_xuat/lich_su_nhap.php" class="sidebar-link"><i class="fa-solid fa-prescription-bottle-medical"></i><span>Lịch Sử Nhập Hàng</span></a></li>
         <li class="sidebar-item"><a href="/qlkhohang/quanly/quan_ly_nhap_xuat/lich_su_xuat.php" class="sidebar-link"><i class="fa-solid fa-money-bill"></i><span>Lịch Sử Xuất Hàng</span></a></li>
         <li class="sidebar-item"><a href="/qlkhohang/quanly/san_pham/sp.php" class="sidebar-link"><i class="fa-solid fa-tablets"></i><span>Sản Phẩm</span></a></li>
-
+        <li class="sidebar-item"><a href="/qlkhohang/quanly/kho_hang/thongke.php" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i><span>Thống kê</span></a></li>
+        <li class="sidebar-item"><a href="/qlkhohang/quanly/kho_hang/baocao.php" class="sidebar-link"><i class="fa-solid fa-flag"></i><span>Báo cáo</span></a></li>
 <!--         
         <li class="sidebar-item"><a href="/htqlnhathuoc/admin/giam_gia/gg.php" class="sidebar-link"><i class="fa-solid fa-percent"></i><span>Khuyến Mãi</span></a></li>
         <li class="sidebar-item"><a href="/htqlnhathuoc/admin/nhap_hang/nh.php" class="sidebar-link"><i class="fa-solid fa-file-invoice-dollar"></i><span>Nhập Hàng</span></a></li>

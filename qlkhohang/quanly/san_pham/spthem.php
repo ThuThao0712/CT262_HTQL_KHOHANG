@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $DM_ID = test_input($_POST["DM_ID"]);
     $NCC_ID = test_input($_POST["NCC_ID"]);
 
-    $mysqli = new mysqli("localhost", "root", "", "qlkhohang"); //chỉnh cái này
+    $mysqli = new mysqli("localhost", "TK_TenDangNhap", "TK_MatKhau", "qlkhohang"); 
     if ($mysqli->connect_error) {
         die("Kết nối không thành công: " . $mysqli->connect_error);
     }
@@ -35,7 +35,7 @@ function test_input($data) {
     return $data;
 }
 
-$mysqli = new mysqli("localhost", "root", "", "qlkhohang");
+$mysqli = new mysqli("localhost", "TK_TenDangNhap", "TK_MatKhau", "qlkhohang");
 if ($mysqli->connect_error) {
     die("Kết nối không thành công: " . $mysqli->connect_error);
 }
@@ -54,34 +54,58 @@ while ($row = $resultNCC->fetch_assoc()) {
 $mysqli->close();
 ?>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <body>
-    <div class="main">
+    <div class="all">
         <h2>✅ Thêm SẢN PHẨM ✅</h2>
-        <?php if (!empty($errorMessage)) echo "<div class='alert alert-danger'>$errorMessage</div>"; ?>
-        <form method="POST">
-            <label>Tên Sản Phẩm</label>
-            <input type="text" name="SP_Ten" required>
 
-            <label>Giá</label>
-            <input type="number" name="SP_Gia" required>
+            <div class="tkad">
+                <div class="dstaikhoan">
+                    <div class="main">
+                        <?php if (!empty($errorMessage)) echo "<div class='alert alert-danger'>$errorMessage</div>"; ?>
+                        <form method="post">
+                            <div class="mb-3 row">
 
-            <label>Danh Mục</label>
-            <select name="DM_ID">
-                <option value="">-- Chọn Danh Mục --</option>
-                <?php foreach ($categories as $category) { echo "<option value='{$category['DM_ID']}'>{$category['DM_Ten']}</option>"; } ?>
-            </select>
+                            <div class="mb-3 row">
+                                <label class="col-sm-2 col-form-label">Tên Sản Phẩm</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="SP_Ten" value="<?php echo $SP_Ten; ?>" required>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label">Danh Mục</label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" name="DM_ID" required>
+                                        <option value="">-- Chọn Danh Mục --</option>
+                                        <?php foreach ($categories as $category) { echo "<option value='{$category['DM_ID']}'>{$category['DM_Ten']}</option>"; } ?>
+                                    </select>
+                                </div>
+                            </div>
 
-            <label>Nhà Cung Cấp</label>
-            <select name="NCC_ID">
-                <option value="">-- Chọn Nhà Cung Cấp --</option>
-                <?php foreach ($nhacungcap as $ncc) { echo "<option value='{$ncc['NCC_ID']}'>{$ncc['NCC_HoTen']}</option>"; } ?>
-            </select>
 
-            <button type="submit">Thêm</button>
-            <a href="sp.php">Hủy</a>
-        </form>
-        <span class="success"><?php echo $successMessage; ?></span>
+                            
+                            <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label">Nhà Cung Cấp</label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" name="NCC_ID" required>
+                                        <option value="">-- Chọn Nhà Cung Cấp --</option>
+                                        <?php foreach ($nhacungcap as $ncc) { echo "<option value='{$ncc['NCC_ID']}'>{$ncc['NCC_HoTen']}</option>"; } ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-sm-10">
+                                    <button type="submit" name="add-btn" class="btn btn-success btn-lg">Thêm</button>
+                                    <a href="sp.php" class="btn btn-outline-danger btn-lg">Hủy</a>
+                                </div>
+                            </div>
+
+                        </form>
+                        <span class="success"><?php echo $successMessage; ?></span>
+                    </div>
+                </div>
+            </div>
     </div>
 </body>
 </html>

@@ -3,8 +3,8 @@ if (isset($_GET["SP_ID"])) {
     $SP_ID = $_GET["SP_ID"];
 
     $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $username = "TK_TenDangNhap";
+    $password = "TK_MatKhau";
     $dbname = "qlkhohang";
 
     $connection = new mysqli($servername, $username, $password, $dbname);

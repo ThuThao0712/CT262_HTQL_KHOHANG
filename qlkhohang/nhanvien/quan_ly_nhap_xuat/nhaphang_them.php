@@ -1,8 +1,8 @@
 <?php
 // Kết nối trực tiếp MySQL
 $servername = "localhost";
-$username = "root";  // Thay bằng tài khoản MySQL của bạn
-$password = "";      // Thay bằng mật khẩu nếu có
+$username = "TK_TenDangNhap";  // Thay bằng tài khoản MySQL của bạn
+$password = "TK_MatKhau";      // Thay bằng mật khẩu nếu có
 $dbname = "qlkhohang";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -38,16 +38,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($conn->query($sql) === TRUE) {
         $PN_ID = $conn->insert_id; // Lấy ID của phiếu nhập vừa tạo
 
-        // Thêm vào bảng `chi_tiet_phieu_nhap`
+        // Lấy KHO_ID của "Kho Tổng"
+        $sql_kho_tong = "SELECT KHO_ID FROM kho_hang WHERE KHO_Ten = 'Kho Tổng' LIMIT 1";
+        $result_kho_tong = $conn->query($sql_kho_tong);
+        $row_kho_tong = $result_kho_tong->fetch_assoc();
+        $KHO_ID_TONG = $row_kho_tong['KHO_ID'];
+
+        $TongSoLuongNhapKho = 0; // Tổng số lượng nhập vào kho_hang
+
+        // Thêm vào bảng `chi_tiet_phieu_nhap` và cập nhật kho
         foreach ($SP_IDs as $index => $SP_ID) {
+            $soLuongNhap = $SoLuongNhaps[$index]; // Số lượng nhập của từng sản phẩm
+            $TongSoLuongNhapKho += $soLuongNhap; // Cộng dồn tổng số lượng
+
+            // Thêm vào bảng chi_tiet_phieu_nhap
             $sql_ct = "INSERT INTO chi_tiet_phieu_nhap (PN_ID, SP_ID, CTPN_SoLuongNhap, CTPN_GiaNhap, CTPN_ThueVAT) 
-                       VALUES ('$PN_ID', '$SP_ID', '{$SoLuongNhaps[$index]}', '{$DonGiaNhaps[$index]}', '{$ThueVATs[$index]}')";
+                       VALUES ('$PN_ID', '$SP_ID', '$soLuongNhap', '{$DonGiaNhaps[$index]}', '{$ThueVATs[$index]}')";
             $conn->query($sql_ct);
 
-            // Cập nhật số lượng trong kho
-            $sql_update_kho = "UPDATE kho_cn SET KCN_SoLuong = KCN_SoLuong + {$SoLuongNhaps[$index]} WHERE SP_ID = '$SP_ID'";
-            $conn->query($sql_update_kho);
+            // Kiểm tra sản phẩm đã có trong kho_cn hay chưa
+            $sql_check_kho = "SELECT * FROM kho_cn WHERE SP_ID = '$SP_ID' AND KHO_ID = '$KHO_ID_TONG'";
+            $result_check_kho = $conn->query($sql_check_kho);
+            
+            if ($result_check_kho->num_rows > 0) {
+                // Nếu sản phẩm đã có, cập nhật số lượng
+                $sql_update_kho_cn = "UPDATE kho_cn SET KCN_SoLuong = KCN_SoLuong + $soLuongNhap 
+                                      WHERE SP_ID = '$SP_ID' AND KHO_ID = '$KHO_ID_TONG'";
+            } else {
+                // Nếu sản phẩm chưa có, thêm mới vào kho_cn
+                $sql_update_kho_cn = "INSERT INTO kho_cn (SP_ID, KHO_ID, KCN_SoLuong) 
+                                      VALUES ('$SP_ID', '$KHO_ID_TONG', '$soLuongNhap')";
+            }
+            $conn->query($sql_update_kho_cn);
         }
+
+        // Chỉ cập nhật tổng số lượng kho_hang một lần duy nhất
+        $sql_update_kho_hang = "UPDATE kho_hang SET KHO_SoLuong = KHO_SoLuong + $TongSoLuongNhapKho 
+                                WHERE KHO_ID = '$KHO_ID_TONG'";
+        $conn->query($sql_update_kho_hang);
 
         header("Location: lich_su_nhap.php?success=1"); 
         exit();
@@ -73,6 +101,7 @@ foreach ($nhacungcaps as $ncc) {
 
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -120,18 +149,6 @@ $conn->close();
                     <label class="col-sm-2 col-form-label">Số Lượng Nhập</label>
                     <div class="col-sm-10">
                         <input type="number" class="form-control" name="CTPN_SoLuongNhap[]" required>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Đơn Giá Nhập</label>
-                    <div class="col-sm-10">
-                        <input type="number" class="form-control" name="CTPN_DonGiaNhap[]" required>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label">Thuế VAT (%)</label>
-                    <div class="col-sm-10">
-                        <input type="number" class="form-control" name="CTPN_ThueVAT[]" required>
                     </div>
                 </div>
                 <button type="button" class="btn btn-danger removeProduct">Xóa</button>

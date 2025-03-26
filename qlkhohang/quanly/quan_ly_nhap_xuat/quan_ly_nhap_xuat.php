@@ -2,8 +2,8 @@
     require_once '../blocks/head.php';
 
     $servername = "localhost"; 
-    $username = "root"; 
-    $password = ""; 
+    $username = "TK_TenDangNhap"; 
+    $password = "TK_MatKhau"; 
     $dbname = "qlkhohang"; 
 
     // Kết nối database
@@ -62,7 +62,6 @@
                                     <td>Ngày Lập</td>
                                     <td>Giờ Lập</td>
                                     <td>Tổng Số Lượng</td>
-                                    <td>Tổng Tiền</td>
                                     <td>Nhà Cung Cấp</td>
                                     <td>Sản Phẩm</td>
                                     <td>Hành động</td>
@@ -75,7 +74,6 @@
                                         <td><?php echo $row['PN_NgayLap']; ?></td>
                                         <td><?php echo $row['PN_GioLap']; ?></td>
                                         <td><?php echo $row['PN_TongSoLuongNhap']; ?></td>
-                                        <td><?php echo $row['PN_TongTienNhap']; ?></td>
                                         <td><?php echo $row['NCC_HoTen']; ?></td>
                                         <td><?php echo $row['SP_Ten']; ?></td>
                                         <td>

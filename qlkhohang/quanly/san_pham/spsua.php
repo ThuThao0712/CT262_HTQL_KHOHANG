@@ -1,6 +1,6 @@
 <?php
 require_once '../blocks/head.php';
-$mysqli = new mysqli("localhost", "root", "", "qlkhohang"); // chỉnh cái này
+$mysqli = new mysqli("localhost", "TK_TenDangNhap", "TK_MatKhau", "qlkhohang"); // chỉnh cái này
 
 if ($mysqli->connect_error) {
     die("Kết nối không thành công: " . $mysqli->connect_error);
@@ -74,10 +74,7 @@ $mysqli->close();
                 <label>Tên Sản Phẩm</label>
                 <input type="text" class="form-control" name="SP_Ten" value="<?php echo $SP_Ten; ?>" required>
             </div>
-            <div class="mb-3">
-                <label>Giá Sản Phẩm</label>
-                <input type="number" class="form-control" name="SP_Gia" value="<?php echo $SP_Gia; ?>" required>
-            </div>
+
             <div class="mb-3">
                 <label>Danh mục</label>
                 <select name="DM_ID" class="form-control">

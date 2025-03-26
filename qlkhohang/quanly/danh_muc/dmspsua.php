@@ -1,9 +1,9 @@
 <?php
     require_once '../blocks/head.php';
 
-    $servername = "localhost";
-    $username = "root"; 
-    $password = "";
+    $servername = "localhost"; 
+    $username = "TK_TenDangNhap"; 
+    $password = "TK_MatKhau"; 
     $dbname = "qlkhohang"; 
 
     $connection = new mysqli($servername, $username, $password, $dbname);

@@ -1,13 +1,11 @@
 <?php
     if (isset($_GET["DM_ID"])) {
         $DM_ID = $_GET["DM_ID"];
-
         $servername = "localhost"; 
-        $username = "root"; 
-        $password = ""; 
+        $username = "TK_TenDangNhap"; 
+        $password = "TK_MatKhau"; 
         $dbname = "qlkhohang"; 
-
-        $connection = new mysqli($servername, $username, $password, $dbname);
+     $connection = new mysqli($servername, $username, $password, $dbname);
 
         if ($connection->connect_error) {
             die("Kết nối không thành công: " . $connection->connect_error);

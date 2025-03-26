@@ -1,14 +1,34 @@
 <?php
 require_once '../blocks/head.php';
+session_start(); // Bắt đầu session để lấy thông tin nhân viên
 
 $servername = "localhost"; 
-$username = "root"; 
-$password = ""; 
+$username = "TK_TenDangNhap"; 
+$password = "TK_MatKhau"; 
 $dbname = "qlkhohang"; 
 
 $connection = new mysqli($servername, $username, $password, $dbname);
 if ($connection->connect_error) {
     die("Kết nối không thành công: " . $connection->connect_error);
+}
+
+// Lấy NV_ID từ session (giả sử bạn đã lưu khi đăng nhập)
+$NV_ID = isset($_SESSION['NV_ID']) ? $_SESSION['NV_ID'] : 0;
+
+if ($NV_ID == 0) {
+    die("Lỗi: Không xác định được nhân viên.");
+}
+
+// Lấy KHO_ID của nhân viên
+$stmt = $connection->prepare("SELECT KHO_ID FROM nhan_vien WHERE NV_ID = ?");
+$stmt->bind_param("i", $NV_ID);
+$stmt->execute();
+$stmt->bind_result($KHO_ID);
+$stmt->fetch();
+$stmt->close();
+
+if (!$KHO_ID) {
+    die("Lỗi: Nhân viên không có kho hàng được phân công.");
 }
 
 $search = isset($_GET['search']) ? $_GET['search'] : '';
@@ -18,16 +38,28 @@ $sql = "SELECT sp.SP_ID, sp.SP_Ten, sp.SP_Gia, dm.DM_Ten, ncc.NCC_HoTen,
         FROM san_pham sp
         JOIN danh_muc_sp dm ON sp.DM_ID = dm.DM_ID
         JOIN nha_cung_cap ncc ON sp.NCC_ID = ncc.NCC_ID
-        LEFT JOIN kho_cn ON sp.SP_ID = kho_cn.SP_ID AND kho_cn.KHO_ID = 1";
+        LEFT JOIN kho_cn ON sp.SP_ID = kho_cn.SP_ID 
+        WHERE kho_cn.KHO_ID = ?";
 
 if (!empty($search)) {
-    $sql .= " WHERE (sp.SP_Ten LIKE '%$search%' OR dm.DM_Ten LIKE '%$search%')";
+    $sql .= " AND (sp.SP_Ten LIKE ? OR dm.DM_Ten LIKE ?)";
 }
 
 $sql .= " ORDER BY sp.SP_ID ASC";
 
-$result = $connection->query($sql);
+$stmt = $connection->prepare($sql);
+
+if (!empty($search)) {
+    $searchParam = "%$search%";
+    $stmt->bind_param("iss", $KHO_ID, $searchParam, $searchParam);
+} else {
+    $stmt->bind_param("i", $KHO_ID);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -56,7 +88,6 @@ $result = $connection->query($sql);
                             <tr>
                                 <td>ID</td>
                                 <td>Tên Sản Phẩm</td>
-                                <td>Giá</td>
                                 <td>Danh Mục</td>
                                 <td>Nhà Cung Cấp</td>
                                 <td>Số Lượng Tồn Kho</td>
@@ -72,7 +103,6 @@ $result = $connection->query($sql);
                                 <tr>
                                     <td>{$row['SP_ID']}</td>
                                     <td>{$row['SP_Ten']}</td>
-                                    <td>" . number_format($row['SP_Gia'], 0, ',', '.') . " đ</td>
                                     <td>{$row['DM_Ten']}</td>
                                     <td>{$row['NCC_HoTen']}</td>
                                     <td>{$row['KCN_SoLuong']}</td>
